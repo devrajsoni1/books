@@ -1,0 +1,1 @@
+//create a class which has all the details about a book
