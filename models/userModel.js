@@ -1,52 +1,41 @@
-const { User, UserFactory } = require('./user');
+const mongoose = require('mongoose');
 
-const usersDB = {}; // Simulated database to store users
+const userSchema = new mongoose.Schema({
+  loginId: String,
+  password: String,
+});
 
-const userFactory = new UserFactory();
+const User = mongoose.model('User', userSchema);
 
-function createUser({ loginId, password }) {
-  const newUser = userFactory.create({ loginId, password });
-  usersDB[newUser.id] = newUser;
-  return newUser;
+// Create a new user
+function createUser(userData) {
+  return User.create(userData);
 }
 
-function getUser(id) {
-  return usersDB[id];
+// Get a user by ID
+function getUserById(userId) {
+  return User.findById(userId);
 }
 
-function updateUser(id, userData) {
-  const user = usersDB[id];
-  if (!user) return null;
-  // You can add logic to update user properties here if needed
-  return user;
-}
-
-function deleteUser(id) {
-  const user = usersDB[id];
-  if (!user) return false;
-  delete usersDB[id];
-  return true;
-}
-
+// Get all users
 function getAllUsers() {
-  return Object.values(usersDB);
+  return User.find();
 }
 
-function authenticateUser(loginId, password) {
-  for (const userId in usersDB) {
-    const user = usersDB[userId];
-    if (user.loginId === loginId && user.password === password) {
-      return user;
-    }
-  }
-  return null;
+// Update a user by ID
+function updateUserById(userId, newData) {
+  return User.findByIdAndUpdate(userId, newData, { new: true });
+}
+
+// Delete a user by ID
+function deleteUserById(userId) {
+  return User.findByIdAndRemove(userId);
 }
 
 module.exports = {
   createUser,
-  getUser,
-  updateUser,
-  deleteUser,
+  getUserById,
   getAllUsers,
-  authenticateUser,
+  updateUserById,
+  deleteUserById,
 };

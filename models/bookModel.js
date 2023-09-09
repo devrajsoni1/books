@@ -1,43 +1,44 @@
-const { Book } = require('./book'); // Import the Book class from the previous code
+const mongoose = require('mongoose');
 
-const booksDB = {}; // Simulated database to store books
+const bookSchema = new mongoose.Schema({
+  title: String,
+  author: String,
+  publishDate: Date,
+  price: Number,
+  available: Boolean,
+});
 
-function generateUniqueId() {
-  return Date.now().toString(36) + Math.random().toString(36).substring(2);
-}
+const Book = mongoose.model('Book', bookSchema);
 
+// Create a new book
 function createBook(bookData) {
-  const newBook = Book.create(bookData);
-  booksDB[newBook.id] = newBook;
-  return newBook;
+  return Book.create(bookData);
 }
 
-function getBook(id) {
-  return booksDB[id];
+// Get a book by ID
+function getBookById(bookId) {
+  return Book.findById(bookId);
 }
 
-function updateBook(id, bookData) {
-  const book = booksDB[id];
-  if (!book) return null;
-  book.update(bookData);
-  return book;
-}
-
-function deleteBook(id) {
-  const book = booksDB[id];
-  if (!book) return false;
-  delete booksDB[id];
-  return true;
-}
-
+// Get all books
 function getAllBooks() {
-  return Object.values(booksDB);
+  return Book.find();
+}
+
+// Update a book by ID
+function updateBookById(bookId, newData) {
+  return Book.findByIdAndUpdate(bookId, newData, { new: true });
+}
+
+// Delete a book by ID
+function deleteBookById(bookId) {
+  return Book.findByIdAndRemove(bookId);
 }
 
 module.exports = {
   createBook,
-  getBook,
-  updateBook,
-  deleteBook,
+  getBookById,
   getAllBooks,
+  updateBookById,
+  deleteBookById,
 };
