@@ -1,47 +1,73 @@
-const { createBook, getBook, updateBook, deleteBook, getAllBooks } = require('./bookModel');
+const {
+  createBook,
+  getBookById,
+  updateBookById,
+  deleteBookById,
+  getAllBooks,
+} = require('./bookModel');
 
 // Controller methods
 
-function createBookController(req, res) {
-  const { title, author, publishDate, price } = req.body;
-  const newBook = createBook({ title, author, publishDate, price });
-  res.status(201).json(newBook);
-}
-
-function getBookController(req, res) {
-  const { id } = req.params;
-  const book = getBook(id);
-  if (book) {
-    res.json(book);
-  } else {
-    res.status(404).json({ error: 'Book not found' });
+async function createBookController(req, res) {
+  const { title, author, publishDate, price, available } = req.body;
+  try {
+    const newBook = await createBook({ title, author, publishDate, price, available });
+    res.status(201).json(newBook);
+  } catch (error) {
+    res.status(500).json({ error: 'Internal server error' });
   }
 }
 
-function updateBookController(req, res) {
+async function getBookController(req, res) {
+  const { id } = req.params;
+  try {
+    const book = await getBookById(id);
+    if (book) {
+      res.json(book);
+    } else {
+      res.status(404).json({ error: 'Book not found' });
+    }
+  } catch (error) {
+    res.status(500).json({ error: 'Internal server error' });
+  }
+}
+
+async function updateBookController(req, res) {
   const { id } = req.params;
   const { price } = req.body;
-  const updatedBook = updateBook(id, { price });
-  if (updatedBook) {
-    res.json(updatedBook);
-  } else {
-    res.status(404).json({ error: 'Book not found' });
+  try {
+    const updatedBook = await updateBookById(id, { price });
+    if (updatedBook) {
+      res.json(updatedBook);
+    } else {
+      res.status(404).json({ error: 'Book not found' });
+    }
+  } catch (error) {
+    res.status(500).json({ error: 'Internal server error' });
   }
 }
 
-function deleteBookController(req, res) {
+async function deleteBookController(req, res) {
   const { id } = req.params;
-  const isDeleted = deleteBook(id);
-  if (isDeleted) {
-    res.status(204).send();
-  } else {
-    res.status(404).json({ error: 'Book not found' });
+  try {
+    const isDeleted = await deleteBookById(id);
+    if (isDeleted) {
+      res.status(204).send();
+    } else {
+      res.status(404).json({ error: 'Book not found' });
+    }
+  } catch (error) {
+    res.status(500).json({ error: 'Internal server error' });
   }
 }
 
-function getAllBooksController(req, res) {
-  const books = getAllBooks();
-  res.json(books);
+async function getAllBooksController(req, res) {
+  try {
+    const books = await getAllBooks();
+    res.json(books);
+  } catch (error) {
+    res.status(500).json({ error: 'Internal server error' });
+  }
 }
 
 module.exports = {

@@ -1,56 +1,87 @@
-const { createUser, getUser, updateUser, deleteUser, getAllUsers, authenticateUser } = require('./userModel');
+const {
+  createUser,
+  getUserById,
+  updateUserById,
+  deleteUserById,
+  getAllUsers,
+  authenticateUser,
+} = require('./userModel');
 
 // Controller methods
 
-function createUserController(req, res) {
+async function createUserController(req, res) {
   const { loginId, password } = req.body;
-  const newUser = createUser({ loginId, password });
-  res.status(201).json(newUser);
-}
-
-function getUserController(req, res) {
-  const { id } = req.params;
-  const user = getUser(id);
-  if (user) {
-    res.json(user);
-  } else {
-    res.status(404).json({ error: 'User not found' });
+  try {
+    const newUser = await createUser({ loginId, password });
+    res.status(201).json(newUser);
+  } catch (error) {
+    res.status(500).json({ error: 'Internal server error' });
   }
 }
 
-function updateUserController(req, res) {
+async function getUserController(req, res) {
+  const { id } = req.params;
+  try {
+    const user = await getUserById(id);
+    if (user) {
+      res.json(user);
+    } else {
+      res.status(404).json({ error: 'User not found' });
+    }
+  } catch (error) {
+    res.status(500).json({ error: 'Internal server error' });
+  }
+}
+
+async function updateUserController(req, res) {
   const { id } = req.params;
   const userData = req.body;
-  const updatedUser = updateUser(id, userData);
-  if (updatedUser) {
-    res.json(updatedUser);
-  } else {
-    res.status(404).json({ error: 'User not found' });
+  try {
+    const updatedUser = await updateUserById(id, userData);
+    if (updatedUser) {
+      res.json(updatedUser);
+    } else {
+      res.status(404).json({ error: 'User not found' });
+    }
+  } catch (error) {
+    res.status(500).json({ error: 'Internal server error' });
   }
 }
 
-function deleteUserController(req, res) {
+async function deleteUserController(req, res) {
   const { id } = req.params;
-  const isDeleted = deleteUser(id);
-  if (isDeleted) {
-    res.status(204).send();
-  } else {
-    res.status(404).json({ error: 'User not found' });
+  try {
+    const isDeleted = await deleteUserById(id);
+    if (isDeleted) {
+      res.status(204).send();
+    } else {
+      res.status(404).json({ error: 'User not found' });
+    }
+  } catch (error) {
+    res.status(500).json({ error: 'Internal server error' });
   }
 }
 
-function getAllUsersController(req, res) {
-  const users = getAllUsers();
-  res.json(users);
+async function getAllUsersController(req, res) {
+  try {
+    const users = await getAllUsers();
+    res.json(users);
+  } catch (error) {
+    res.status(500).json({ error: 'Internal server error' });
+  }
 }
 
-function authenticateUserController(req, res) {
+async function authenticateUserController(req, res) {
   const { loginId, password } = req.body;
-  const user = authenticateUser(loginId, password);
-  if (user) {
-    res.json({ message: 'Authentication successful', user });
-  } else {
-    res.status(401).json({ error: 'Authentication failed' });
+  try {
+    const user = await authenticateUser(loginId, password);
+    if (user) {
+      res.json({ message: 'Authentication successful', user });
+    } else {
+      res.status(401).json({ error: 'Authentication failed' });
+    }
+  } catch (error) {
+    res.status(500).json({ error: 'Internal server error' });
   }
 }
 
