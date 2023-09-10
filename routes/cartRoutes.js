@@ -3,16 +3,16 @@ const {
   createCartController,
   getCartController,
   updateCartController,
-  deleteCartController,
-  getAllCartsController,
-} = require('./cartController');
+  addToCartController,
+  removeFromCartController,
+} = require('../controllers/cartController');
 
 const router = express.Router();
 
 router.post('/carts', createCartController);
 router.get('/carts/:id', getCartController);
 router.put('/carts/:id', updateCartController);
-router.delete('/carts/:id', deleteCartController);
-router.get('/carts', getAllCartsController);
+router.put('/carts/:id', addToCartController);
+router.delete('/carts/:id', removeFromCartController);
 
 module.exports = router;

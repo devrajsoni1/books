@@ -3,7 +3,7 @@ const {
   getCartByUserId,
   addToCart,
   removeFromCart,
-} = require('./cartModel');
+} = require('../models/cartModel');
 
 // Controller methods
 
@@ -59,9 +59,40 @@ async function removeFromCartController(req, res) {
   }
 }
 
+async function updateCartController(req, res) {
+  const { userId, action, bookId } = req.body;
+
+  try {
+    let message = '';
+
+    if (action === 'add') {
+      const updatedCart = await addToCart(userId, bookId);
+      if (updatedCart) {
+        message = 'Book added to cart successfully';
+      } else {
+        return res.status(404).json({ error: 'Book not found or not available' });
+      }
+    } else if (action === 'remove') {
+      const updatedCart = await removeFromCart(userId, bookId);
+      if (updatedCart) {
+        message = 'Book removed from cart successfully';
+      } else {
+        return res.status(404).json({ error: 'Book not found in the cart' });
+      }
+    } else {
+      return res.status(400).json({ error: 'Invalid action' });
+    }
+
+    res.status(200).json({ message });
+  } catch (error) {
+    res.status(500).json({ error: 'Internal server error' });
+  }
+}
+
 module.exports = {
   createCartController,
   getCartController,
   addToCartController,
   removeFromCartController,
+  updateCartController
 };

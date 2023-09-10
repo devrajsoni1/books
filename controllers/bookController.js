@@ -4,7 +4,7 @@ const {
   updateBookById,
   deleteBookById,
   getAllBooks,
-} = require('./bookModel');
+} = require('../models/bookModel');
 
 // Controller methods
 
@@ -70,10 +70,33 @@ async function getAllBooksController(req, res) {
   }
 }
 
+async function getBookAvailability(req, res) {
+  const { id } = req.params; // Assuming you pass the book ID as a parameter
+
+  try {
+    // Call a function (e.g., getBookById) to retrieve the book by ID from the database
+    const book = await getBookById(id);
+
+    if (book) {
+      // Check if the 'available' data member is true
+      if (book.available) {
+        res.json({ message: 'Book is available' });
+      } else {
+        res.json({ message: 'Book is not available' });
+      }
+    } else {
+      res.status(404).json({ error: 'Book not found' });
+    }
+  } catch (error) {
+    res.status(500).json({ error: 'Internal server error' });
+  }
+}
+
 module.exports = {
   createBookController,
   getBookController,
   updateBookController,
   deleteBookController,
   getAllBooksController,
+  getBookAvailability
 };

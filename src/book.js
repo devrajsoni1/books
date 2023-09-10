@@ -8,7 +8,7 @@ class Book {
       this.available = available;
     }
   
-    update({ title, author, publishDate, price }) {
+    update({ title, author, publishDate, price, available }) {
       if (title) this.title = title;
       if (author) this.author = author;
       if (publishDate) this.publishDate = publishDate;

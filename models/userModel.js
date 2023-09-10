@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 
 const userSchema = new mongoose.Schema({
+  id: String,
   loginId: String,
   password: String,
 });
@@ -13,8 +14,8 @@ function createUser(userData) {
 }
 
 // Get a user by ID
-function getUserById(userId) {
-  return User.findById(userId);
+function getUserById(id) {
+  return User.findById(id);
 }
 
 // Get all users
