@@ -2,11 +2,13 @@ const express = require('express');
 const {
   createUserController,
   getUserController,
+  loginUserController
 } = require('../controllers/userController');
 
 const router = express.Router();
 
 router.post('/createUser', createUserController);
+router.post('/loginUser', loginUserController);
 router.get('/getUser/:id', getUserController);
 
 //Not of use as of now

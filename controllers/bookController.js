@@ -1,19 +1,24 @@
 const Book = require('../models/bookModel');
+const { BookFactory } = require('../src/book');
 
 // Controller methods
 
 async function createBookController(req, res) {
-  const { title, author, publishDate, genre, price, available } = req.body;
+  const { bookId, title, author, publishDate, genre, price, available } = req.body;
   try {
 
-    newBook = new Book({
+    const bookFactory = new BookFactory();
+    const book = bookFactory.create({
+      bookId: bookId,
       title: title,
       author: author,
       publishDate :  Date.parse(publishDate),
       genre: genre,
       price: price,
       available: available
-    })
+    });
+
+    newBook = new Book(book);
 
     newBook.save()
     .then((newBook) => {
@@ -30,9 +35,9 @@ async function createBookController(req, res) {
 }
 
 async function getBookController(req, res) {
-  const { id } = req.params;
+  const { bookId } = req.body;
   try {
-    const book = await Book.findById(id);
+    const book = await Book.findById(bookId);
     if (book) {
       res.json(book);
     } else {
@@ -44,12 +49,13 @@ async function getBookController(req, res) {
 }
 
 async function updateBookController(req, res) {
-  const { id, title, author, publishDate, genre, price, available} = req.body;
+  const { bookId, title, author, publishDate, genre, price, available} = req.body;
   try {
     const book = await Book.findByIdAndUpdate({
-      id: id
+      bookId: bookId
     },
     {
+      bookId: bookId,
       title: title,
       author: author,
       publishDate: Date.parse(publishDate),
@@ -72,9 +78,9 @@ async function updateBookController(req, res) {
 }
 
 async function deleteBookController(req, res) {
-  const { id } = req.params;
+  const { bookId } = req.body;
   try {
-    const isDeleted = await Book.findByIdAndDelete(id);
+    const isDeleted = await Book.findByIdAndDelete(bookId);
     if (isDeleted) {
       res.status(204).send();
     } else {
@@ -95,11 +101,11 @@ async function getAllBooksController(req, res) {
 }
 
 async function getBookAvailability(req, res) {
-  const { id } = req.params; // Assuming you pass the book ID as a parameter
+  const { bookId } = req.body; // Assuming you pass the book ID as a parameter
 
   try {
     // Call a function (e.g., getBookById) to retrieve the book by ID from the database
-    const book = await Book.findById(id);
+    const book = await Book.findById(bookId);
 
     if (book) {
       // Check if the 'available' data member is true
@@ -119,10 +125,10 @@ async function getBookAvailability(req, res) {
 }
 
 async function markUnavlController(req, res) {
-  const {id, status} = req.body;
+  const {bookId} = req.body;
   try{
     const book = await Book.findByIdAndUpdate({
-      id: id
+      bookId: bookId
     },
     {
       available: false

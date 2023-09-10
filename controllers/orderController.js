@@ -1,14 +1,21 @@
-Order = require('../models/orderModel');
+OrderModel = require('../models/orderModel');
+const {Cart} = require('../src/cart');
+CartModel = require('../models/cartModel');
+
+const {getCartController, 
+emptyCartController} = require('./cartController')
 
 async function createOrderController(req, res) {
-    const {id, books, status} = req.body;
+    const {userId, orderId, books, status} = req.body;
     try {
 
-        newOrder = new Order({
-            id: id,
-            books: books,
-            status: status
-        });
+        let totalValue = 0;
+
+        getCartController(req, res);
+
+        const order = new OrderModel(userId, orderId, books, status, totalValue);
+
+        newOrder = new Order(order);
 
         await newOrder.save()
         .then((newOrder) => {
@@ -18,6 +25,8 @@ async function createOrderController(req, res) {
             console.error('Error saving order:', error);
           });
     
+        emptyCartController(req, res);
+        
         res.status(201).json(newUser);
       } catch (error) {
         res.status(500).json({ error: 'Internal server error' });
@@ -26,9 +35,9 @@ async function createOrderController(req, res) {
 }
 
 async function getOrderStatusController(req, res) {
-    const {id} = req.body
+    const {userId} = req.body
     try{
-        const order = Order.findById({id});
+        const order = Order.findById({userId});
         res.status(200).json(order.status);
     }
     catch(error){

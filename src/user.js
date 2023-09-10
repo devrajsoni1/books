@@ -1,7 +1,7 @@
 class User {
-    constructor(id, loginId, password) {
-      this.id = id;
-      this.loginId = loginId;
+    constructor(userId, emailId, password) {
+      this.userId = userId;
+      this.emailId = emailId;
       this.password = password;
     }
   
@@ -9,9 +9,9 @@ class User {
   }
   
   class UserFactory {
-    create({ loginId, password }) {
+    create({ emailId, password }) {
       const id = generateUniqueId();
-      return new User(id, loginId, password);
+      return new User(id, emailId, password);
     }
   }
   

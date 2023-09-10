@@ -1,8 +1,10 @@
 class Order {
-    constructor(userId, books, status) {
+    constructor(userId, orderId, books, status) {
       this.userId = userId;
+      this.orderId = orderId;
       this.books = books;
       this.status = status;
+      this.totalValue = 0;
     }
   }
 
