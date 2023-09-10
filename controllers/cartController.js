@@ -1,14 +1,16 @@
-const Cart = require('../models/cartModel');
+const CartModel = require('../models/cartModel');
+const {Cart} = require('../src/cart');
 
 // Controller methods
 
 async function createCartController(req, res) {
   const { userId } = req.body;
   try {
-    newCart = new Cart({
-      userId: userId,
-      books: []
-    });
+
+    let books = [];
+    const cart = new Cart(userId, books);
+
+    newCart = new CartModel(cart);
 
     newCart.save()
     .then((newCart) => {
@@ -25,9 +27,9 @@ async function createCartController(req, res) {
 }
 
 async function getCartController(req, res) {
-  const { userId } = req.params;
+  const { userId } = req.body;
   try {
-    const cart = await Cart.findById(userId);
+    const cart = await CartModel.findById(userId);
 
     if (cart) {
       let books = cart.books;
@@ -62,7 +64,15 @@ async function addToCartController(req, res) {
 async function removeFromCartController(req, res) {
   const { userId, bookId } = req.body;
   try {
-    const updatedCart = await removeFromCart(userId, bookId);
+
+    const cart = await CartModel.findById({userId});
+    if(!cart){
+      return res.status(404).json("Cart not found for the user");
+    }
+
+    //TODO: complete this
+    const updatedcart = await CartModel.findb
+
     if (updatedCart) {
       res.status(200).json({ message: 'Book removed from cart successfully' });
     } else {
@@ -103,10 +113,38 @@ async function updateCartController(req, res) {
   }
 }
 
+async function emptyCartController(req, res) {
+  const {userId} = req.body;
+  try{
+    const cart = await CartModel.findById({userId});
+    if(!cart){
+      return res.status(404).json("Cart doesn't exist for the user")
+    }
+
+    let books = [];
+    const updatedCart = new Cart();
+    updatedCart({userId, books});
+    newCart = new Cart(updatedCart);
+
+    newCart.save()
+    .then((newCart) => {
+      console.log('Cart cleared for the user:', newCart.userId);
+    })
+    .catch((error) => {
+      console.error('Error clearing cart:', error);
+    });
+  }
+  catch(error){
+    console.log(error.message);
+    res.status(404).json("Cart not found");
+  }
+}
+
 module.exports = {
   createCartController,
   getCartController,
   addToCartController,
   removeFromCartController,
-  updateCartController
+  updateCartController,
+  emptyCartController
 };

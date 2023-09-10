@@ -1,6 +1,6 @@
 class Book {
-    constructor(id, title, author, publishDate, genre, price) {
-      this.id = id;
+    constructor(bookId, title, author, publishDate, genre, price) {
+      this.bookId = bookId;
       this.title = title;
       this.author = author;
       this.publishDate = publishDate;
@@ -9,7 +9,8 @@ class Book {
       this.available = available;
     }
   
-    update({ title, author, publishDate, price, available }) {
+    update({bookId, title, author, publishDate, price, available }) {
+      if (bookId) this.bookId = bookId;
       if (title) this.title = title;
       if (author) this.author = author;
       if (publishDate) this.publishDate = publishDate;
@@ -20,8 +21,8 @@ class Book {
   }
   
   class BookFactory {
-    create({ title, author, publishDate, genre, price, available }) {
-      const id = generateUniqueId();
+    create({ bookId, title, author, publishDate, genre, price, available }) {
+      const bookId = generateUniqueId();
       return new Book(id, title, author, publishDate, genre, price, available);
     }
   }
