@@ -1,17 +1,24 @@
-const {
-  createCart,
-  getCartByUserId,
-  addToCart,
-  removeFromCart,
-} = require('../models/cartModel');
+const Cart = require('../models/cartModel');
 
 // Controller methods
 
 async function createCartController(req, res) {
   const { userId } = req.body;
   try {
-    const cart = await createCart(userId);
-    res.status(201).json(cart);
+    newCart = new Cart({
+      userId: userId,
+      books: []
+    });
+
+    newCart.save()
+    .then((newCart) => {
+      console.log('Cart saved to the database:', newCart);
+    })
+    .catch((error) => {
+      console.error('Error saving cart:', error);
+    });
+
+    res.status(201).json(newCart);
   } catch (error) {
     res.status(500).json({ error: 'Internal server error' });
   }
@@ -20,8 +27,15 @@ async function createCartController(req, res) {
 async function getCartController(req, res) {
   const { userId } = req.params;
   try {
-    const cart = await getCartByUserId(userId);
+    const cart = await Cart.findById(userId);
+
     if (cart) {
+      let books = cart.books;
+      // for(){
+      //   if(!getBookAvailability(books[i].bookId)){
+      //     await removeFromCart()
+      //   }
+      // }
       res.json(cart.books);
     } else {
       res.status(404).json({ error: 'Cart not found' });
