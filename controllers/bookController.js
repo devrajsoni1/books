@@ -1,17 +1,28 @@
-const {
-  createBook,
-  getBookById,
-  updateBookById,
-  deleteBookById,
-  getAllBooks,
-} = require('../models/bookModel');
+const Book = require('../models/bookModel');
 
 // Controller methods
 
 async function createBookController(req, res) {
-  const { title, author, publishDate, price, available } = req.body;
+  const { title, author, publishDate, genre, price, available } = req.body;
   try {
-    const newBook = await createBook({ title, author, publishDate, price, available });
+
+    newBook = new Book({
+      title: title,
+      author: author,
+      publishDate :  Date.parse(publishDate),
+      genre: genre,
+      price: price,
+      available: available
+    })
+
+    newBook.save()
+    .then((newBook) => {
+      console.log('Book saved to the database:', newBook);
+    })
+    .catch((error) => {
+      console.error('Error saving user:', error);
+    });
+
     res.status(201).json(newBook);
   } catch (error) {
     res.status(500).json({ error: 'Internal server error' });
@@ -21,7 +32,7 @@ async function createBookController(req, res) {
 async function getBookController(req, res) {
   const { id } = req.params;
   try {
-    const book = await getBookById(id);
+    const book = await Book.findById(id);
     if (book) {
       res.json(book);
     } else {
@@ -33,10 +44,23 @@ async function getBookController(req, res) {
 }
 
 async function updateBookController(req, res) {
-  const { id } = req.params;
-  const { price } = req.body;
+  const { id, title, author, publishDate, genre, price, available} = req.body;
   try {
-    const updatedBook = await updateBookById(id, { price });
+    const book = await Book.findByIdAndUpdate({
+      id: id
+    },
+    {
+      title: title,
+      author: author,
+      publishDate: Date.parse(publishDate),
+      genre: genre,
+      price: price,
+      available: available
+    }
+    );
+
+    res.status(201).json(book);
+
     if (updatedBook) {
       res.json(updatedBook);
     } else {
@@ -50,7 +74,7 @@ async function updateBookController(req, res) {
 async function deleteBookController(req, res) {
   const { id } = req.params;
   try {
-    const isDeleted = await deleteBookById(id);
+    const isDeleted = await Book.findByIdAndDelete(id);
     if (isDeleted) {
       res.status(204).send();
     } else {
@@ -63,7 +87,7 @@ async function deleteBookController(req, res) {
 
 async function getAllBooksController(req, res) {
   try {
-    const books = await getAllBooks();
+    const books = await Book.find();
     res.json(books);
   } catch (error) {
     res.status(500).json({ error: 'Internal server error' });
@@ -75,14 +99,16 @@ async function getBookAvailability(req, res) {
 
   try {
     // Call a function (e.g., getBookById) to retrieve the book by ID from the database
-    const book = await getBookById(id);
+    const book = await Book.findById(id);
 
     if (book) {
       // Check if the 'available' data member is true
       if (book.available) {
-        res.json({ message: 'Book is available' });
+        console.log("Book is available");
+        res.json(book.available);
       } else {
-        res.json({ message: 'Book is not available' });
+        console.log("Book is unavailable");
+        res.json(book.available);
       }
     } else {
       res.status(404).json({ error: 'Book not found' });
@@ -92,11 +118,31 @@ async function getBookAvailability(req, res) {
   }
 }
 
+async function markUnavlController(req, res) {
+  const {id, status} = req.body;
+  try{
+    const book = await Book.findByIdAndUpdate({
+      id: id
+    },
+    {
+      available: false
+    }
+    );
+
+    res.status(201).json(book);
+  }
+  catch(error){
+    console.log(error.message);
+    res.status(500).json({error: 'Internal Server Error'});
+  }
+}
+
 module.exports = {
   createBookController,
   getBookController,
   updateBookController,
   deleteBookController,
   getAllBooksController,
-  getBookAvailability
+  getBookAvailability,
+  markUnavlController,
 };

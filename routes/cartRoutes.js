@@ -9,10 +9,10 @@ const {
 
 const router = express.Router();
 
-router.post('/carts', createCartController);
-router.get('/carts/:id', getCartController);
-router.put('/carts/:id', updateCartController);
-router.put('/carts/:id', addToCartController);
-router.delete('/carts/:id', removeFromCartController);
+router.post('/createCart', createCartController);
+router.get('/getCart/:id', getCartController);
+router.put('/updateCart/:id', updateCartController);
+router.put('/addToCart/:id', addToCartController);
+router.delete('/remFromCart/:id', removeFromCartController);
 
 module.exports = router;
