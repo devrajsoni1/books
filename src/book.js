@@ -21,9 +21,9 @@ class Book {
   }
   
   class BookFactory {
-    create({ bookId, title, author, publishDate, genre, price, available }) {
+    create({ title, author, publishDate, genre, price, available }) {
       const bookId = generateUniqueId();
-      return new Book(id, title, author, publishDate, genre, price, available);
+      return new Book(bookId, title, author, publishDate, genre, price, available);
     }
   }
   

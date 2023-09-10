@@ -2,7 +2,6 @@ const User = require('../models/userModel');
 const { UserFactory } = require('../src/user');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const { check, validationResult } = require('express-validator');
 
 const jwtSecret = "";
 
