@@ -5,7 +5,7 @@ const {
   deleteUserById,
   getAllUsers,
   authenticateUser,
-} = require('./userModel');
+} = require('../models/userModel');
 
 // Controller methods
 

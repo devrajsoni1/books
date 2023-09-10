@@ -5,7 +5,8 @@ const {
   updateBookController,
   deleteBookController,
   getAllBooksController,
-} = require('./bookController');
+  getBookAvailability
+} = require('../controllers/bookController.js');
 
 const router = express.Router();
 
@@ -15,5 +16,6 @@ router.get('/books/:id', getBookController);
 router.put('/books/:id', updateBookController);
 router.delete('/books/:id', deleteBookController);
 router.get('/books', getAllBooksController);
+router.get('/books', getBookAvailability);
 
 module.exports = router;

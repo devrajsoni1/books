@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const databaseURI = 'your-database-uri'; // Replace with your MongoDB database URI
+const databaseURI = 'mongodb+srv://pranshukoshta7:60kWfYDBs09UmMre@proj-dev.8uhcfft.mongodb.net/?retryWrites=true&w=majority'; // Replace with your MongoDB database URI
 
 mongoose.connect(databaseURI, {
   useNewUrlParser: true,
