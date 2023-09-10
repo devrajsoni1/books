@@ -1,3 +1,5 @@
+//DEPRECATED
+
 const mongoose = require('mongoose');
 
 // const databaseURI = 'mongodb+srv://pranshukoshta7:60kWfYDBs09UmMre@proj-dev.8uhcfft.mongodb.net/?retryWrites=true&w=majority';
