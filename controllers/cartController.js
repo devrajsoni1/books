@@ -1,5 +1,6 @@
 const CartModel = require('../models/cartModel');
 const {Cart} = require('../src/cart');
+const Book = require('../models/bookModel');
 
 // Controller methods
 
@@ -8,9 +9,12 @@ async function createCartController(req, res) {
   try {
 
     let books = [];
-    const cart = new Cart(userId, books);
+    const cart = new Cart({
+      userId: userId,
+      books: books
+    });
 
-    newCart = new CartModel(cart);
+    const newCart = new CartModel(cart);
 
     newCart.save()
     .then((newCart) => {
@@ -29,16 +33,10 @@ async function createCartController(req, res) {
 async function getCartController(req, res) {
   const { userId } = req.body;
   try {
-    const cart = await CartModel.findById(userId);
+    const cart = await CartModel.findOne({userId: userId});
 
     if (cart) {
-      let books = cart.books;
-      // for(){
-      //   if(!getBookAvailability(books[i].bookId)){
-      //     await removeFromCart()
-      //   }
-      // }
-      res.json(cart.books);
+      return res.json(cart.books);
     } else {
       res.status(404).json({ error: 'Cart not found' });
     }
@@ -50,7 +48,11 @@ async function getCartController(req, res) {
 async function addToCartController(req, res) {
   const { userId, bookId } = req.body;
   try {
-    const updatedCart = await addToCart(userId, bookId);
+
+    const newBook = await Book.findOne({bookId: bookId});
+
+    const updatedCart = await Cart.updateOne({userId: userId}, { $push : {books: newBook}});
+
     if (updatedCart) {
       res.status(200).json({ message: 'Book added to cart successfully' });
     } else {
@@ -65,15 +67,17 @@ async function removeFromCartController(req, res) {
   const { userId, bookId } = req.body;
   try {
 
-    const cart = await CartModel.findById({userId});
+    const bookToRemove = await Book.findOne({bookId});
+
+    const cart = await Cart.findOne({userId: userId});
+
     if(!cart){
       return res.status(404).json("Cart not found for the user");
     }
 
-    //TODO: complete this
-    const updatedcart = await CartModel.findb
+    const updatedCart = await CartModel.updateOne({userId: userId}, {$pull : {books: bookToRemove}});
 
-    if (updatedCart) {
+    if(updatedCart) {
       res.status(200).json({ message: 'Book removed from cart successfully' });
     } else {
       res.status(404).json({ error: 'Book not found in the cart' });
@@ -83,56 +87,28 @@ async function removeFromCartController(req, res) {
   }
 }
 
-async function updateCartController(req, res) {
-  const { userId, action, bookId } = req.body;
-
-  try {
-    let message = '';
-
-    if (action === 'add') {
-      const updatedCart = await addToCart(userId, bookId);
-      if (updatedCart) {
-        message = 'Book added to cart successfully';
-      } else {
-        return res.status(404).json({ error: 'Book not found or not available' });
-      }
-    } else if (action === 'remove') {
-      const updatedCart = await removeFromCart(userId, bookId);
-      if (updatedCart) {
-        message = 'Book removed from cart successfully';
-      } else {
-        return res.status(404).json({ error: 'Book not found in the cart' });
-      }
-    } else {
-      return res.status(400).json({ error: 'Invalid action' });
-    }
-
-    res.status(200).json({ message });
-  } catch (error) {
-    res.status(500).json({ error: 'Internal server error' });
-  }
-}
-
 async function emptyCartController(req, res) {
   const {userId} = req.body;
   try{
-    const cart = await CartModel.findById({userId});
+    const cart = await CartModel.findOne({userId: userId});
     if(!cart){
       return res.status(404).json("Cart doesn't exist for the user")
     }
 
-    let books = [];
-    const updatedCart = new Cart();
-    updatedCart({userId, books});
-    newCart = new Cart(updatedCart);
+    const updatedCart = await Cart.updateOne(
+      {userId: userId},
+      {
+        $set: {
+          books: []
+        }
+      }
+    );
 
-    newCart.save()
-    .then((newCart) => {
-      console.log('Cart cleared for the user:', newCart.userId);
-    })
-    .catch((error) => {
-      console.error('Error clearing cart:', error);
-    });
+    if(updatedCart) {
+      res.status(200).json({ message: 'Cart emptied successfully' });
+    } else {
+      res.status(404).json({ error: 'Cart not found' });
+    }
   }
   catch(error){
     console.log(error.message);
@@ -145,6 +121,5 @@ module.exports = {
   getCartController,
   addToCartController,
   removeFromCartController,
-  updateCartController,
   emptyCartController
 };

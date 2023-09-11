@@ -18,7 +18,7 @@ async function createBookController(req, res) {
       available: available
     });
 
-    newBook = new Book(book);
+    const newBook = new Book(book);
 
     newBook.save()
     .then((newBook) => {
@@ -37,7 +37,7 @@ async function createBookController(req, res) {
 async function getBookController(req, res) {
   const { bookId } = req.body;
   try {
-    const book = await Book.findById(bookId);
+    const book = await Book.findOne({bookId: bookId});
     if (book) {
       res.json(book);
     } else {
@@ -51,7 +51,7 @@ async function getBookController(req, res) {
 async function updateBookController(req, res) {
   const { bookId, title, author, publishDate, genre, price, available} = req.body;
   try {
-    const book = await Book.findByIdAndUpdate({
+    const book = await Book.findOneAndUpdate({
       bookId: bookId
     },
     {
@@ -80,7 +80,7 @@ async function updateBookController(req, res) {
 async function deleteBookController(req, res) {
   const { bookId } = req.body;
   try {
-    const isDeleted = await Book.findByIdAndDelete(bookId);
+    const isDeleted = await Book.findOneAndDelete({bookId: bookId});
     if (isDeleted) {
       res.status(204).send();
     } else {
@@ -105,7 +105,7 @@ async function getBookAvailability(req, res) {
 
   try {
     // Call a function (e.g., getBookById) to retrieve the book by ID from the database
-    const book = await Book.findById(bookId);
+    const book = await Book.findOne({bookId: bookId});
 
     if (book) {
       // Check if the 'available' data member is true
@@ -127,7 +127,7 @@ async function getBookAvailability(req, res) {
 async function markUnavlController(req, res) {
   const {bookId} = req.body;
   try{
-    const book = await Book.findByIdAndUpdate({
+    const book = await Book.findOneAndUpdate({
       bookId: bookId
     },
     {

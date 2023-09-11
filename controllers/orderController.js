@@ -1,21 +1,30 @@
 OrderModel = require('../models/orderModel');
+const CartModel = require('../models/cartModel');
 const {Cart} = require('../src/cart');
+const { Order } = require('../src/order');
 CartModel = require('../models/cartModel');
-
-const {getCartController, 
-emptyCartController} = require('./cartController')
 
 async function createOrderController(req, res) {
     const {userId, orderId, books, status} = req.body;
     try {
+        const cart = await CartModel.findOne({userId: userId});
+        
+        const books = cart.books;
+        const totalValue = books.reduce((acc, book) => acc + book.price, 0);
 
-        let totalValue = 0;
+        // const temp = { body: {userId} };
+        // const response = await getCartController(temp);
 
-        getCartController(req, res);
+        //userId, orderId, books, status, totalValue
+        const order = new Order({
+          userId: userId, 
+          orderId: orderId, 
+          books: cart.books, 
+          status: status, 
+          totalValue: totalValue
+        });
 
-        const order = new OrderModel(userId, orderId, books, status, totalValue);
-
-        newOrder = new Order(order);
+        const newOrder = new Order(order);
 
         await newOrder.save()
         .then((newOrder) => {
@@ -25,9 +34,17 @@ async function createOrderController(req, res) {
             console.error('Error saving order:', error);
           });
     
-        emptyCartController(req, res);
-        
-        res.status(201).json(newUser);
+        const updatedCart = await Cart.updateOne(
+          {userId: userId},
+          {
+            $set: {
+              books: []
+            }
+          }
+        );
+        if(updatedCart){
+          res.status(201).json("Order placed and cart emptied");
+        }
       } catch (error) {
         res.status(500).json({ error: 'Internal server error' });
       }
@@ -37,7 +54,7 @@ async function createOrderController(req, res) {
 async function getOrderStatusController(req, res) {
     const {userId} = req.body
     try{
-        const order = Order.findById({userId});
+        const order = Order.findOne({userId: userId});
         res.status(200).json(order.status);
     }
     catch(error){
