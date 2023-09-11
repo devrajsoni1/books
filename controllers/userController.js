@@ -3,7 +3,7 @@ const { UserFactory } = require('../src/user');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
-const jwtSecret = "";
+const jwtSecret = "PRANSHU";
 
 const {
   createCartController
@@ -15,7 +15,7 @@ async function createUserController(req, res) {
   const {userId, emailId, password} = req.body;
   try {
 
-    let retrievedUser = await User.findOne({emailId});
+    let retrievedUser = await User.findOne({emailId: emailId});
     if(retrievedUser){
       return res.status(406).json("User already exists");
     }
@@ -31,7 +31,7 @@ async function createUserController(req, res) {
       password: hashedPassword
     });
 
-    newUser = new User(user);
+    const newUser = new User(user);
 
     await newUser.save()
     .then((newUser) => {
@@ -69,7 +69,7 @@ async function loginUserController(req, res) {
   const {emailId, password} = req.body;
 
   try{
-    let user = await User.findOne({emailId});
+    let user = await User.findOne({emailId: emailId});
 
     if(!user){
       return res.status(400).json("Invalid Credentials");

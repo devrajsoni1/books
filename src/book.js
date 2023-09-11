@@ -1,5 +1,5 @@
 class Book {
-    constructor(bookId, title, author, publishDate, genre, price) {
+    constructor(bookId, title, author, publishDate, genre, price, available) {
       this.bookId = bookId;
       this.title = title;
       this.author = author;
@@ -9,7 +9,7 @@ class Book {
       this.available = available;
     }
   
-    update({bookId, title, author, publishDate, price, available }) {
+    update({bookId, title, author, publishDate, genre, price, available }) {
       if (bookId) this.bookId = bookId;
       if (title) this.title = title;
       if (author) this.author = author;

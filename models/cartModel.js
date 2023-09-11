@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const Book = require('./bookModel')
 
 const cartSchema = new mongoose.Schema({
   userId: {
@@ -7,7 +8,7 @@ const cartSchema = new mongoose.Schema({
   },
   books: [{
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'Book', // Reference to the Book model
+    ref: Book, // Reference to the Book model
   }],
 });
 
